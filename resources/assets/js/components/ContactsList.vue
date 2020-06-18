@@ -1,7 +1,7 @@
 <template>
     <div class="contacts-list">
         <ul>
-            <li v-for="contact in contacts" :key="contact.id"  @click="selectContact(contact)" :class="{ 'selected': contact == selected }" >
+            <li v-for="contact in sortedContacts" :key="contact.id"  @click="selectContact(contact)" :class="{ 'selected': contact == selected }" >
                 <div class="avatar">
                     <img :src="contact.profile_image" :alt="contact.name">
                 </div>
@@ -32,11 +32,20 @@
          selectContact(contact) {
                 this.selected = contact;
                 this.$emit('selected', contact);
+
+                
             }
         
         },
         computed: {
- 
+             sortedContacts() {
+                return _.sortBy(this.contacts, [(contact) => {
+                    if (contact == this.selected) {
+                        return Infinity;
+                    }
+                    return contact.unread;
+                }]).reverse();
+            }
         }
     }
 </script>

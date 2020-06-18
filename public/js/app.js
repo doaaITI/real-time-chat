@@ -55812,7 +55812,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         startConversationWith: function startConversationWith(contact) {
             var _this2 = this;
 
-            // this.updateUnreadCount(contact, true);
+            this.updateUnreadCount(contact, true);
             axios.get('/conversation/' + contact.id).then(function (response) {
                 _this2.messages = response.data;
                 _this2.selectedContact = contact;
@@ -55827,7 +55827,16 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                 return;
             }
 
-            // this.updateUnreadCount(message.from_contact, false);
+            this.updateUnreadCount(message.from_contact, false);
+        },
+        updateUnreadCount: function updateUnreadCount(contact, reset) {
+            this.contacts = this.contacts.map(function (single) {
+                if (single.id !== contact.id) {
+                    return single;
+                }
+                if (reset) single.unread = 0;else single.unread += 1;
+                return single;
+            });
         }
     },
     components: { Conversation: __WEBPACK_IMPORTED_MODULE_0__Conversation___default.a, ContactsList: __WEBPACK_IMPORTED_MODULE_1__ContactsList___default.a }
@@ -56508,7 +56517,18 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             this.$emit('selected', contact);
         }
     },
-    computed: {}
+    computed: {
+        sortedContacts: function sortedContacts() {
+            var _this = this;
+
+            return _.sortBy(this.contacts, [function (contact) {
+                if (contact == _this.selected) {
+                    return Infinity;
+                }
+                return contact.unread;
+            }]).reverse();
+        }
+    }
 });
 
 /***/ }),
@@ -56522,7 +56542,7 @@ var render = function() {
   return _c("div", { staticClass: "contacts-list" }, [
     _c(
       "ul",
-      _vm._l(_vm.contacts, function(contact) {
+      _vm._l(_vm.sortedContacts, function(contact) {
         return _c(
           "li",
           {

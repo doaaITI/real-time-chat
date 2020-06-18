@@ -65,4 +65,17 @@ class ContactsController extends Controller
 
         return response()->json($message);
     }
+
+    public function markRead($id){
+        $messages = Message::where(function($q) use ($id) {
+            $q->where('from', auth()->id());
+            $q->where('to', $id);
+        })->orWhere(function($q) use ($id) {
+            $q->where('from', $id);
+            $q->where('to', auth()->id());
+        })
+        ->where('read' ,false)->update(['read'=>true]);
+        return response()->json('updated successfully');
+
+    }
 }
